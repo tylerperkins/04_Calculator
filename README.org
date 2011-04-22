@@ -1,0 +1,14 @@
+** Fall 2010 Stanford course, /Developing Apps for iOS/.
+
+**** This excellent series of online lectures is available through [[http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewPodcast%3Fid%3D395605774][iTunes U]].
+**** You can download slides from the lectures and associated [[http://www.stanford.edu/class/cs193p/cgi-bin/drupal/downloads-2010-fall][assignments]].
+
+** This repository contains my solution to [[http://www.stanford.edu/class/cs193p/cgi-bin/drupal/system/files/assignments/Assignment%203_1.pdf][Assignment III]]
+
+*** Differences from the 02_Calculator:
+
+This is the first commit, so there are no differences.
+
+*** Differences from Assignment III requirements:
+
+Currently not complete.
