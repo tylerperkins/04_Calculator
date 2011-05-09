@@ -8,14 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@class CalculatorViewController;
-
 @interface CalculatorAppDelegate : NSObject <UIApplicationDelegate> {
-
 }
-
 @property (nonatomic, retain) IBOutlet UIWindow *window;
-
-@property (nonatomic, retain) IBOutlet CalculatorViewController *viewController;
 
 @end

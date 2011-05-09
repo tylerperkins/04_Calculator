@@ -7,11 +7,13 @@
 //
 
 #import <SenTestingKit/SenTestingKit.h>
+#import "CalculatorViewController.h"
 
 
 @interface CalculatorTests : SenTestCase {
 @private
-    
+    CalculatorViewController* calculatorViewController;
+    NSDictionary* buttons;
 }
 
 @end

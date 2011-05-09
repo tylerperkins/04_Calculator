@@ -242,6 +242,9 @@ NSString* variableValue( NSString* txt, const NSDictionary* bindings ) {
 {
     NSString* oprnd;
 
+    //  Clear data from any previous calculation in this brain.
+    [brain init];
+
     for ( NSArray* arr in pl ) {
 
         //  If the operand in arr is a variable with a binding, replace it.
@@ -261,20 +264,6 @@ NSString* variableValue( NSString* txt, const NSDictionary* bindings ) {
                     withObject:[arr objectAtIndex:2]
         ];
     }
-}
-
-
-+ (num) evaluateExpression:(Expression*)expr
-          usingVariableValues:(NSDictionary*)vars
-{
-    id plist = [CalculatorBrain propertyListForExpression:expr];
-    CalculatorBrain* brain = [CalculatorBrain new];
-
-    [CalculatorBrain runPlist:plist inBrain:brain withBindings:vars];
-
-    num rslt = [brain.expression hasVariables] ? NAN : brain.result;
-    [brain release];
-    return rslt;
 }
 
 

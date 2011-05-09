@@ -52,9 +52,6 @@ typedef num (^binaryOperation)(num,num);
           inBrain:(CalculatorBrain*)brain
      withBindings:(NSDictionary*)bindings;
 
-+ (num) evaluateExpression:(Expression*)expr
-          usingVariableValues:(NSDictionary*)vars;
-
 + (NSSet*) variablesInExpression:(Expression*)expr;
 
 + (NSString*) descriptionOfExpression:(Expression*)expr;

@@ -8,15 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "CalculatorBrain.h"
+#import "GraphViewController.h"
 
-@interface CalculatorViewController : UIViewController {
-    IBOutlet UILabel*         display;
-    IBOutlet CalculatorBrain* brain;
-    IBOutlet UIButton*        solveButton;
-
-    NSString* operandToSubmit;
+@interface CalculatorViewController : UIViewController <GraphDataDelegate> {
     BOOL userIsInTheMiddleOfTypingANumber;
 }
+@property (nonatomic,retain) IBOutlet UILabel*             display;
+@property (nonatomic,retain) IBOutlet UIButton*            equalsButton;
+@property (nonatomic,retain) IBOutlet CalculatorBrain*     brain;
+@property (nonatomic,retain) IBOutlet GraphViewController* graphViewController;
 
 - (IBAction) digitPressed:(UIButton*)sender;
 
@@ -52,6 +52,6 @@
 
 - (IBAction) clearPressed;
 
-- (IBAction) solvePressed;
+- (IBAction) graphPressed;
 
 @end

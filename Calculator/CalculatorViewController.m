@@ -12,24 +12,23 @@
     category declaration) is used just to declare the private methods.
 */
 @interface CalculatorViewController ()  // (Could've named it, but unneces.)
-@property (retain,nonatomic) NSString* operandToSubmit;
+@property (nonatomic,retain) NSString* operandToSubmit;
 - (void) reset;
 - (void) show:(NSString*)str;
 - (void) showResult;
+- (void) releaseGUIOutlets;
 + (void) button:(UIButton*)btn setEnabled:(BOOL)state;
 @end
 
 
 @implementation CalculatorViewController
+@synthesize equalsButton;
 
 
-@synthesize operandToSubmit;
+@synthesize display,brain,graphViewController,operandToSubmit;
 
 
-- (id) init {
-    //  Initialize, but don't mess with outlets. This provides a convenient
-    //  way to reset the calculator to its original state.
-    
+- (id) init {    
     id obj = [super init];
     if ( obj ) {
         [self reset];
@@ -38,18 +37,15 @@
 }
 
 
-- (void)dealloc
-{
-    [display release];
-    [brain release];
-    [solveButton release];
-    [operandToSubmit release];
+- (void) dealloc {
+    [self releaseGUIOutlets];
+    self.brain =  nil;
+    self.operandToSubmit = nil;
     [super dealloc];
 }
 
 
-- (void)didReceiveMemoryWarning
-{
+- (void) didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
     
@@ -60,27 +56,16 @@
 #pragma mark - View lifecycle
 
 
-- (void) viewDidLoad {
-    [CalculatorViewController button:solveButton setEnabled:NO]; 
-}
-
-
-- (void) viewDidUnload
-{
-    [display release];
-    display = nil;
-    [solveButton release];
-    solveButton = nil;
+- (void) viewDidUnload {
+    [self releaseGUIOutlets];
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
 }
 
 
-- (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+- (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)ornt
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return  ornt == UIInterfaceOrientationPortrait;
 }
 
 
@@ -228,35 +213,43 @@
 }
 
 
+- (IBAction) graphPressed {
+    [self.navigationController pushViewController:self.graphViewController
+                                         animated:YES
+    ];
+}
 
-- (IBAction) solvePressed {
-    NSDictionary* testDict =
-      [NSDictionary dictionaryWithObjectsAndKeys:
-          @"1.1", @"x",
-          @"2.2", @"a",
-          @"3.3", @"b",
-          nil
-      ];
 
-    /*  Uncomment the following to test CalculatorBrain class methods.
+#pragma mark - Implmentation of protocol GraphDataDelegate
 
-    NSLog(
-        @"\n-- Variables: %@",
-        [CalculatorBrain variablesInExpression:brain.expression]
-    );
 
-    NSLog(
-        @"\n-- Solution is %g",
-        [CalculatorBrain evaluateExpression:brain.expression
-                        usingVariableValues:testDict
-        ]
-    );
-    */
+/*  Create a new anonymous function (a block) that takes one CGFloat variable
+    and returns a CGFloat. It calculates the expression entered by the user
+    where the variable is "x".
+*/
+- (CGFloat (^)(CGFloat)) functionOfX {
+    //  Ensure the expression is terminated by '='.
+    if ( ! [brain.expression isComplete] ) {
+        [self equalsPressed:equalsButton];
+    }
 
-    id plist = [CalculatorBrain propertyListForExpression:brain.expression];
-    [self clearPressed];   // TODO Useful instead to NOT clear STO memory?
-    [CalculatorBrain runPlist:plist inBrain:brain withBindings:testDict];
-    [self showResult];
+    //  Note that these objects must be autoreleased, since references to
+    //  them are kept by the returned block, which itself is autoreleased.
+    //
+    id plist                     =
+      [CalculatorBrain propertyListForExpression:brain.expression];
+    CalculatorBrain* brn         = [[CalculatorBrain new] autorelease];
+    NSMutableDictionary* binding =
+      [NSMutableDictionary dictionaryWithCapacity:1];
+
+    return [[^(CGFloat x){
+        [binding setValue:[NSString stringWithFormat:@"%g", x]
+                   forKey:@"x"
+        ];
+        [CalculatorBrain runPlist:plist inBrain:brn withBindings:binding];
+        return [brn.expression hasVariables] ? NAN : brn.result;
+
+    } copy] autorelease];
 }
 
 
@@ -266,9 +259,10 @@
 /*  Sets this instance to its original state.
 */
 - (void) reset {
+    //  Initialize, but don't mess with outlets. This provides a convenient
+    //  way to reset the calculator to its original state.
     [self show:@"0"];
     userIsInTheMiddleOfTypingANumber = NO;
-    [CalculatorViewController button:solveButton setEnabled:NO];
 }
 
 
@@ -285,16 +279,6 @@
 
     if ( [brain.expression hasVariables] ) {
 
-        //  We have at least one variable, so we can solve. Only enable
-        //  solveButton if the last operation was "=". Otherwise it would be
-        //  enabled after the first operation following a variable button.
-        //  This would be confusing for the user, since the state of the
-        //  "solution" won't reflect the last pending operation, unless she
-        //  types "=" after "solve".
-        [CalculatorViewController button:solveButton
-                              setEnabled:[brain.expression isComplete]
-        ];
-
         //  User has entered a symbolic expression, so just show its textual
         //  representation instead of a numerical result.
         display.text = [brain.expression description];
@@ -310,6 +294,13 @@
     }
 
     userIsInTheMiddleOfTypingANumber = NO;
+}
+
+
+- (void) releaseGUIOutlets {
+    self.display = nil;
+    self.equalsButton = nil;
+    self.graphViewController = nil;
 }
 
 
