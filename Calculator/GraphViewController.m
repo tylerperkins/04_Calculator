@@ -63,8 +63,7 @@
 
 
 - (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)ornt {
-    // Return YES for supported orientations
-    return  ornt == UIInterfaceOrientationPortrait;
+    return YES;
 }
 
 

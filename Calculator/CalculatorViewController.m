@@ -17,7 +17,6 @@
 - (void) show:(NSString*)str;
 - (void) showResult;
 - (void) releaseGUIOutlets;
-+ (void) button:(UIButton*)btn setEnabled:(BOOL)state;
 @end
 
 
@@ -64,8 +63,7 @@
 
 - (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)ornt
 {
-    // Return YES for supported orientations
-    return  ornt == UIInterfaceOrientationPortrait;
+    return YES;
 }
 
 
@@ -301,12 +299,6 @@
     self.display = nil;
     self.equalsButton = nil;
     self.graphViewController = nil;
-}
-
-
-+ (void) button:(UIButton*)btn setEnabled:(BOOL)yorn {
-    btn.enabled = yorn;
-    btn.alpha =  yorn ? 1.0 : 0.5;
 }
 
 
