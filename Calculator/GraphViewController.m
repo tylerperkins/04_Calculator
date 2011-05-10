@@ -73,13 +73,13 @@
 }
 
 
-- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
-    return self.graphView;
+- (IBAction) zoomIn {
+    graphView.widthScaled /= 1.5;
 }
 
 
-- (void) scrollViewDidScroll:(UIScrollView *)scrollView {
-    [self.graphView setNeedsDisplay];
+- (IBAction) zoomOut {
+    graphView.widthScaled *= 1.5;
 }
 
 

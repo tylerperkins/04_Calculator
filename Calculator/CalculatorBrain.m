@@ -181,14 +181,15 @@ NSString* variableValue( NSString* txt, const NSDictionary* bindings );
             caller:(NSString*)selStr
              glyph:(NSString*)glyph
 {
-    if ( [Expression isNumString:oprnd] ) {
+    if ( ! [Expression isNumString:oprnd] || [expression hasVariables] ) {
+        //  User just entered a variable, or did sometime in the history
+        //  of this expression. Just save the args. in existing expr.
+        
+        [expression appendSELStr:selStr operandStr:oprnd glyph:glyph];
+        
+    } else {
         //  Calculate now.
         result = op([Expression makeNumFromString:oprnd]);
-
-    } else {
-        //  Can't calculate because oprnd is a symbol.
-        //  Just record it and the operation in expression.
-        [expression appendSELStr:selStr operandStr:oprnd glyph:glyph];
     }
 }
 

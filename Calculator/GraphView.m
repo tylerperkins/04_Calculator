@@ -13,7 +13,12 @@
 @implementation GraphView
 
 
-@synthesize delegate;
+@synthesize delegate, widthScaled;
+
+
+- (void)awakeFromNib {
+    widthScaled = 10.0;
+}
 
 
 - (void)dealloc {
@@ -23,9 +28,8 @@
 
 - (void)drawRect:(CGRect)rect {
 
-    CGFloat widthScaled           = 10.0;
-    CGFloat axesThicknessInPixels = 1.0;
-    CGFloat plotThicknessInPixels = 2.0;
+    CGFloat axesThicknessInPoints = 1.0;
+    CGFloat plotThicknessInPoints = 2.0;
     CGPoint originNotScaled       =
         CGPointMake(self.bounds.size.width/2.0, self.bounds.size.height/2.0);
 
@@ -42,10 +46,7 @@
     //  (AxesDrawer could be greatly improved, IMHO.)
     //
     [[UIColor colorWithRed:0.0 green:0.0 blue:1.0 alpha:0.33] set];
-    CGContextSetLineWidth(
-        context,
-        axesThicknessInPixels/self.contentScaleFactor
-    );
+    CGContextSetLineWidth( context, axesThicknessInPoints );
     [AxesDrawer drawAxesInRect:self.bounds
                  originAtPoint:originNotScaled
                          scale:scale
@@ -57,7 +58,7 @@
     CGContextTranslateCTM( context, originNotScaled.x, originNotScaled.y );
     CGContextScaleCTM( context, scale, -scale );
 
-    //  Obtain the function to plot from the delegate.
+    //  Obtain from the delegate the function to plot.
     CGFloat (^f)(CGFloat) = [delegate functionOfX];
 
     //  Plot from -widthScaled/2 to widthScaled/2, one data point per pixel.
@@ -66,7 +67,7 @@
     BOOL lastFxWasNAN = YES;       // So we just move, not draw to (xStart,fx).
 
     [[UIColor blackColor] set];
-    CGContextSetLineWidth( context, plotThicknessInPixels/scale );
+    CGContextSetLineWidth( context, plotThicknessInPoints/scale );
     CGContextBeginPath(context);
     for ( int i = 0; i <= boundsWidthInPixels; i++) {
         CGFloat x  = xStart + i/scale;
@@ -80,12 +81,18 @@
                 context, x, fx
             );
         }
-        //  Note that if we didn't get a valid f(x), we did nothing and now
-        //  just continue to the next x value.
+        //  Note that if we didn't get a valid value for f(x), we drew nothing
+        //  and now just continue to the next x value.
 
         lastFxWasNAN = thisFxWasNAN;
     }
 	CGContextStrokePath(context);
+}
+
+
+- (void) setWidthScaled:(CGFloat)newWidthScaled {
+    widthScaled = newWidthScaled;
+    [self setNeedsDisplay];
 }
 
 

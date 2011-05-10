@@ -14,6 +14,7 @@
 
 @interface GraphView : UIView {
 }
-@property (assign) IBOutlet id<GraphDataDelegate> delegate;
+@property (assign,nonatomic) IBOutlet id<GraphDataDelegate> delegate;
+@property (assign,nonatomic)          CGFloat               widthScaled;
 
 @end

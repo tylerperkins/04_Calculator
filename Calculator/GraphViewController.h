@@ -9,18 +9,13 @@
 #import <UIKit/UIKit.h>
 #import "GraphView.h"
 
-@interface GraphViewController : UIViewController
-    <GraphDataDelegate, UIScrollViewDelegate>
-{    
+@interface GraphViewController : UIViewController <GraphDataDelegate> {
 }
-@property (nonatomic,retain) IBOutlet UIView*               graphView;
+@property (nonatomic,retain) IBOutlet GraphView*            graphView;
 @property (assign)           IBOutlet id<GraphDataDelegate> delegate;
 
-//  Implements protocol GraphDataDelegate.
-- (CGFloat (^)(CGFloat)) functionOfX;
-
-//  Optional methods of protocol UIScrollViewDelegate for scrolling & zooming.
-- (UIView *) viewForZoomingInScrollView:(UIScrollView*)scrollView;
-- (void) scrollViewDidScroll:(UIScrollView *)scrollView;
+- (IBAction) zoomIn;
+- (IBAction) zoomOut;
+- (CGFloat (^)(CGFloat)) functionOfX;  // Impl. protocol GraphDataDelegate.
 
 @end

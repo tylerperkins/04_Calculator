@@ -124,6 +124,26 @@ NSDictionary* newDictOfButtonsByTitleInView( UIView* view );
 }
 
 
+- (void) testBinaryWithUnary {
+    CGFloat (^f)(CGFloat);
+
+    [self pushButtonWithTitle:@"x"];
+    [self pushButtonWithTitle:@"*"];
+    [self pushButtonWithTitle:@"1"];
+    [self pushButtonWithTitle:@"sqrt"];
+    STAssertTrue(
+        [calculatorViewController.display.text
+            isEqual:@" x * 1 sqrt"
+        ],
+        @"display string"
+    );
+    f = [calculatorViewController functionOfX];
+    STAssertEquals( f(0.0), (CGFloat)0.0, @" x * 1 sqrt" );
+    STAssertEquals( f(1.0), (CGFloat)1.0, @" x * 1 sqrt" );
+    STAssertEquals( f(2.0), (CGFloat)2.0, @" x * 1 sqrt" );
+}
+
+
 #pragma mark - Private methods and functions
 
 
