@@ -9,34 +9,27 @@
 #import "GraphViewController.h"
 
 
+@interface GraphViewController ()
+@property (retain,nonatomic) CGFloat (^cachedFunctionOfX)(CGFloat);
+@end
+
+
 @implementation GraphViewController
 
 
-@synthesize graphView, delegate;
-
-
-- (id) initWithNibName:(NSString *)nibNameOrNil
-                bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
+@synthesize graphView, delegate, cachedFunctionOfX;
 
 
 - (void) dealloc {
     self.graphView = nil;
+    self.cachedFunctionOfX = nil;
     [super dealloc];
 }
 
 
 - (void)didReceiveMemoryWarning {
-    // Releases the view if it doesn't have a superview.
+    self.cachedFunctionOfX = nil;
     [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc that aren't in use.
 }
 
 
@@ -51,13 +44,13 @@
 
 - (void) viewDidUnload {
     self.graphView = nil;
+    self.cachedFunctionOfX = nil;
     [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
 }
 
 
 - (void)viewWillAppear:(BOOL)animated {
+    self.cachedFunctionOfX = nil;
     [self.graphView setNeedsDisplay];
 }
 
@@ -68,7 +61,10 @@
 
 
 - (CGFloat (^)(CGFloat)) functionOfX {
-    return [delegate functionOfX];
+    if ( ! self.cachedFunctionOfX ) {
+        self.cachedFunctionOfX = [delegate functionOfX];
+    }
+    return  self.cachedFunctionOfX;
 }
 
 

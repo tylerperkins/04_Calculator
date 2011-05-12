@@ -5,10 +5,45 @@
 
 ** This repository contains my solution to [[http://www.stanford.edu/class/cs193p/cgi-bin/drupal/system/files/assignments/Assignment%203_1.pdf][Assignment III]]
 
-*** Differences from the 02_Calculator:
+*** Unique aspects of my solution:
 
-This is the first commit, so there are no differences.
+**** =@protocol GraphDataDelegate=
 
-*** Differences from Assignment III requirements:
+The assignment asks us to create a protocol the GraphView's delegate conforms
+to, so the GraphView can request from the delegate the data to
+plot. You could just have the GraphView repeatedly ask the delegate
+for the function value at a given argument. This, I think, is the
+solution expected by the assignment. But it seemed to me a better idea
+to provide to the GraphView /just the data/, and to provide it /all at
+once at the time the graph is requested/.
 
-Currently not complete.
+Strictly speaking, taking such a snapshot at graph time is not
+necessary, because the CalculatorViewController doesn't actually do
+anything while the user is working with the graph. But I'm talking
+about best practices here. If we didn't grab such a snapshot from the
+delegate, we would be unconsciously imposing a constraint on the
+delegate: Some of its state must not change while the GraphView is
+plotting. This is the classic entanglement wrought by objects
+containing mutable state.
+
+So my GraphDataDelegate protocol just specifies a method that the
+GraphView uses to ask the GraphViewController delegate for an
+(immutable) closure, which is an Objective-C block implementing the
+requested anonymous function. Semantically, that's exactly what we
+want to hand to the GraphView, because it's exactly the thing we're
+graphing, a mathematical function of one variable.
+
+**** Using the current transformation matrix (CTM)
+
+The powerful affine transformation functions provided by Quartz 2D are
+truly the right tools for the job, here. They correctly adjust the
+coordinate system as we zoom, pan, or rotate. We don't have to adjust
+the function we're plotting just to accomodate a change in scale or shift
+in location. So in my GraphView's =drawRect:= method, I employ functions
+=CGContextTranslateCTM= and =CGContextScaleCTM=.
+
+Unfortunately, the =AxesDrawer= provided by Stanford for use in the
+assignment assumes the default coordinate system. So drawing the axes
+must be done /before/ we change the CTM. This forces us to think about
+two different ways to draw things. Really, I think the AxesDrawer
+should be rewritten anyway, but that's a task for another day!

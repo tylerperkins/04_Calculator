@@ -27,28 +27,11 @@
 @synthesize display,brain,graphViewController,operandToSubmit;
 
 
-- (id) init {    
-    id obj = [super init];
-    if ( obj ) {
-        [self reset];
-    }
-    return obj;
-}
-
-
 - (void) dealloc {
     [self releaseGUIOutlets];
     self.brain =  nil;
     self.operandToSubmit = nil;
     [super dealloc];
-}
-
-
-- (void) didReceiveMemoryWarning {
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc that aren't in use.
 }
 
 
@@ -61,8 +44,7 @@
 }
 
 
-- (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)ornt
-{
+- (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)ornt {
     return YES;
 }
 
@@ -107,6 +89,7 @@
     [self show:sender.titleLabel.text];
     userIsInTheMiddleOfTypingANumber = NO;
 }
+
 
 - (IBAction) negatePressed:(UIButton*)bttn {
 

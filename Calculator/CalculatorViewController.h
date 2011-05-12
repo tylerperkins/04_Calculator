@@ -54,4 +54,6 @@
 
 - (IBAction) graphPressed;
 
+- (CGFloat (^)(CGFloat)) functionOfX;  // Impl. protocol GraphDataDelegate.
+
 @end
