@@ -7,7 +7,7 @@
 
 *** Unique aspects of my solution:
 
-**** =@protocol GraphDataDelegate=
+**** Thinking about =@protocol GraphDataDelegate=
 
 The assignment asks us to create a protocol the GraphView's delegate conforms
 to, so the GraphView can request from the delegate the data to
