@@ -47,3 +47,27 @@ assignment assumes the default coordinate system. So drawing the axes
 must be done /before/ we change the CTM. This forces us to think about
 two different ways to draw things. Really, I think the AxesDrawer
 should be rewritten anyway, but that's a task for another day!
+
+**** Handling discontinuities
+
+There is no truly general solution to the problem of plotting
+functions containing discontinuities. For example, touching buttons
+=x - 1.1 = 1/x Graph= results in a plot with a near-vertical line at
+/x == 1.1/. The mathematical function contains no such line, but one is
+drawn because the value calculated just to the left of /x == 1.1/ is large negative, and just to the right the value is large
+positive -- both good numbers. Well, you might say we could just
+not do the drawing when numbers go to extremes, or maybe when the
+slopes of adjacent coordinates change radically. But then there is the
+problem of what we mean by "extreme" or "radical". What limits could
+we define that would exclude obvious discontinuities like the above, but
+would continue to draw the violent but continuous scribbles
+of /sin(1/x)/ (/i.e./ =x 1/x sin Graph=) surrounding the origin?
+
+So, I just punted! My code never attempts to interpret a sequence of good
+coordinates as a discontinuity. But it certainly can identify a
+discontinuity when the coordinate is not good. When an error results
+from calculating the given function, my code /does/ omit the result
+from the plot. You can see this by plotting the same function shifted a
+bit: =x 1/x Graph=. It works because this time, (at most zoom
+levels) it just so happens that the value at /x == 0, *exactly*,/ is
+calculated, which results in the erroneous value, /NAN/.

@@ -413,7 +413,6 @@
 						<int key="NSvFlags">319</int>
 						<string key="NSFrame">{{148, 410}, {152, 30}}</string>
 						<reference key="NSSuperview" ref="774585933"/>
-						<reference key="NSNextKeyView"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<int key="IBUIContentHorizontalAlignment">0</int>
@@ -444,7 +443,7 @@
 							<int key="NSfFlags">16</int>
 						</object>
 						<int key="IBUIButtonType">1</int>
-						<string key="IBUINormalTitle">graph</string>
+						<string key="IBUINormalTitle">Graph</string>
 						<reference key="IBUIHighlightedTitleColor" ref="819440351"/>
 						<object class="NSColor" key="IBUINormalTitleColor">
 							<int key="NSColorSpace">1</int>
