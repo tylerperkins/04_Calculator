@@ -61,7 +61,7 @@ slopes of adjacent coordinates change radically. But then there is the
 problem of what we mean by "extreme" or "radical". What limits could
 we define that would exclude obvious discontinuities like the above, but
 would continue to draw the violent but continuous scribbles
-of /sin(1/x)/ (/i.e./ =x 1/x sin Graph=) surrounding the origin?
+of /sin(1/x)/ (/i.e./ =x 1/x sin Graph= ) surrounding the origin?
 
 So, I just punted! My code never attempts to interpret a sequence of good
 coordinates as a discontinuity. But it certainly can identify a
@@ -69,5 +69,5 @@ discontinuity when the coordinate is not good. When an error results
 from calculating the given function, my code /does/ omit the result
 from the plot. You can see this by plotting the same function shifted a
 bit: =x 1/x Graph=. It works because this time, (at most zoom
-levels) it just so happens that the value at /x == 0, *exactly*,/ is
+levels) it just so happens that the value at *exactly* /x == 0/ is
 calculated, which results in the erroneous value, /NAN/.
