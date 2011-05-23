@@ -7,4 +7,4 @@
 
 *** Differences my from Assignment III solution:
 
-None. So far, this is just a copy of it.
+Can now zoom and pan using gestures. I also developed a C function, lineWidthScale, which calculates how the thickness of a line changes when scaling of the transform changes. It is not used now, but will be essential when I implement my idea of separate x- and y- zooming.

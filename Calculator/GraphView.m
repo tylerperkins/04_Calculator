@@ -9,32 +9,63 @@
 #import "GraphView.h"
 #import "AxesDrawer.h"
 
-void plot(
-    CGContextRef context,
-    CGFloat      (^f)(CGFloat),
-    CGFloat      xStart,
-    int          numSteps,
-    CGFloat      scale
-);
+@interface GraphView ()
+- (void) plotFunction:(CGFloat (^)(CGFloat))f;
+@end
 
 
 @implementation GraphView
 
 
-@synthesize delegate, widthScaled;
+@synthesize delegate, widthScaled, originNotScaled;
 
 
 - (void)awakeFromNib {
     widthScaled = 10.0;
+    originNotScaled =
+        CGPointMake(self.bounds.size.width/2.0, self.bounds.size.height/2.0);
 }
 
 
-- (void)drawRect:(CGRect)rect {
+/*  In the given context, draws the given function of CGFloat -> CGFloat.
+ */
+void plot(
+          CGContextRef context,
+          CGFloat      (^f)(CGFloat),  // Block calculating f(x).
+          CGFloat      xStart,         // Leftmost x value.
+          int          numSteps,       // Number of data points - 1.
+          CGFloat      scale           // Pixels per unit.
+) {
+    BOOL lastFxWasNAN = YES;     // So we just move, not draw to (xStart,fx).
+    
+    CGContextBeginPath(context);
+    
+    for ( int i = 0; i <= numSteps; i++) {
+        CGFloat x  = xStart + i/scale;
+        CGFloat y = f(x);
+        BOOL thisFxWasNAN = isnan(y);
+        
+        if ( ! thisFxWasNAN ) {
+            //  We got a valid value for f(x). If the last one was not valid,
+            //  just MOVE to the new coords. Othewise, DRAW LINE to the coords.
+            (lastFxWasNAN ? CGContextMoveToPoint : CGContextAddLineToPoint)(
+                context, x, y
+            );
+        }
+        //  Note that if we didn't get a valid value for f(x), we drew nothing
+        //  and now just continue to the next x value.
+
+        lastFxWasNAN = thisFxWasNAN;
+    }
+
+	CGContextStrokePath(context);
+}
+
+
+- (void) drawRect:(CGRect)rect {
 
     CGFloat axesThicknessInPoints = 1.0;
     CGFloat plotThicknessInPoints = 2.0;
-    CGPoint originNotScaled       =
-        CGPointMake(self.bounds.size.width/2.0, self.bounds.size.height/2.0);
 
     int viewWidthInPixels         = round(
         self.bounds.size.width * self.contentScaleFactor
@@ -74,8 +105,19 @@ void plot(
 }
 
 
+- (void) drawRect_NEW:(CGRect)rect {
+    
+}
+
+
 - (void) setWidthScaled:(CGFloat)newWidthScaled {
     widthScaled = newWidthScaled;
+    [self setNeedsDisplay];
+}
+
+
+- (void) setOriginNotScaled:(CGPoint)newOriginNotScaled {
+    originNotScaled = newOriginNotScaled;
     [self setNeedsDisplay];
 }
 
@@ -83,38 +125,8 @@ void plot(
 #pragma mark - Private methods and functions
 
 
-/*  In the given context, draws the given function of CGFloat -> CGFloat.
-*/
-void plot(
-    CGContextRef context,
-    CGFloat      (^f)(CGFloat),  // Block calculating f(x).
-    CGFloat      xStart,         // Leftmost x value.
-    int          numSteps,       // Number of data points - 1.
-    CGFloat      scale           // Pixels per unit.
-) {
-    BOOL lastFxWasNAN = YES;     // So we just move, not draw to (xStart,fx).
-
-    CGContextBeginPath(context);
-
-    for ( int i = 0; i <= numSteps; i++) {
-        CGFloat x  = xStart + i/scale;
-        CGFloat y = f(x);
-        BOOL thisFxWasNAN = isnan(y);
-        
-        if ( ! thisFxWasNAN ) {
-            //  We got a valid value for f(x). If the last one was not valid,
-            //  just MOVE to the new coords. Othewise, DRAW LINE to the coords.
-            (lastFxWasNAN ? CGContextMoveToPoint : CGContextAddLineToPoint)(
-                context, x, y
-            );
-        }
-        //  Note that if we didn't get a valid value for f(x), we drew nothing
-        //  and now just continue to the next x value.
-        
-        lastFxWasNAN = thisFxWasNAN;
-    }
-
-	CGContextStrokePath(context);
+- (void) plotFunction:(CGFloat (^)(CGFloat))f {
+    
 }
 
 

@@ -27,6 +27,9 @@
 		2F0F0B4A1360FA8400F27AB1 /* Expression.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F0F0B431360FA8400F27AB1 /* Expression.m */; };
 		2F0F0B4B1360FA8400F27AB1 /* Expression.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F0F0B431360FA8400F27AB1 /* Expression.m */; };
 		2F37F3741370819F0086D467 /* AxesDrawer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F37F3731370819F0086D467 /* AxesDrawer.m */; };
+		2F37F42E138314F60086D467 /* GraphTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F37F42D138314F60086D467 /* GraphTests.m */; };
+		2F37F4321386DD530086D467 /* UIView+DrawHelp.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F37F4311386DD530086D467 /* UIView+DrawHelp.m */; };
+		2F37F4331386DD530086D467 /* UIView+DrawHelp.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F37F4311386DD530086D467 /* UIView+DrawHelp.m */; };
 		2F7625DD13670B9600764768 /* GraphViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F7625DB13670B9600764768 /* GraphViewController.m */; };
 		2F7625DE13670B9600764768 /* GraphViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F7625DB13670B9600764768 /* GraphViewController.m */; };
 		2F7625F213671EF700764768 /* GraphViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2F7625F013671EF700764768 /* GraphViewController.xib */; };
@@ -71,6 +74,10 @@
 		2F0F0B431360FA8400F27AB1 /* Expression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Expression.m; sourceTree = "<group>"; };
 		2F37F3721370819F0086D467 /* AxesDrawer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AxesDrawer.h; sourceTree = "<group>"; };
 		2F37F3731370819F0086D467 /* AxesDrawer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AxesDrawer.m; sourceTree = "<group>"; };
+		2F37F42C138314F50086D467 /* GraphTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GraphTests.h; path = CalculatorTests/GraphTests.h; sourceTree = SOURCE_ROOT; };
+		2F37F42D138314F60086D467 /* GraphTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GraphTests.m; path = CalculatorTests/GraphTests.m; sourceTree = SOURCE_ROOT; };
+		2F37F4301386DD530086D467 /* UIView+DrawHelp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+DrawHelp.h"; sourceTree = "<group>"; };
+		2F37F4311386DD530086D467 /* UIView+DrawHelp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+DrawHelp.m"; sourceTree = "<group>"; };
 		2F7625DA13670B9600764768 /* GraphViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphViewController.h; sourceTree = "<group>"; };
 		2F7625DB13670B9600764768 /* GraphViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GraphViewController.m; sourceTree = "<group>"; };
 		2F7625F113671EF700764768 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/GraphViewController.xib; sourceTree = "<group>"; };
@@ -144,11 +151,15 @@
 				2F0F0B401360FA8400F27AB1 /* CalculatorViewController.h */,
 				2F0F0B411360FA8400F27AB1 /* CalculatorViewController.m */,
 				2FA648BB1361007D00D6249C /* CalculatorViewController.xib */,
+				2F37F42C138314F50086D467 /* GraphTests.h */,
+				2F37F42D138314F60086D467 /* GraphTests.m */,
 				2F7625DA13670B9600764768 /* GraphViewController.h */,
 				2F7625DB13670B9600764768 /* GraphViewController.m */,
 				2F7625F013671EF700764768 /* GraphViewController.xib */,
 				2FA143971370762700A3B807 /* GraphView.h */,
 				2FA143981370762700A3B807 /* GraphView.m */,
+				2F37F4301386DD530086D467 /* UIView+DrawHelp.h */,
+				2F37F4311386DD530086D467 /* UIView+DrawHelp.m */,
 				2F0F0B3C1360FA8400F27AB1 /* CalculatorBrain.h */,
 				2F0F0B3D1360FA8400F27AB1 /* CalculatorBrain.m */,
 				2F0F0B421360FA8400F27AB1 /* Expression.h */,
@@ -306,6 +317,7 @@
 				2F7625DD13670B9600764768 /* GraphViewController.m in Sources */,
 				2FA143991370762700A3B807 /* GraphView.m in Sources */,
 				2F37F3741370819F0086D467 /* AxesDrawer.m in Sources */,
+				2F37F4321386DD530086D467 /* UIView+DrawHelp.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -319,6 +331,8 @@
 				2F0F0B491360FA8400F27AB1 /* CalculatorViewController.m in Sources */,
 				2F0F0B4B1360FA8400F27AB1 /* Expression.m in Sources */,
 				2F7625DE13670B9600764768 /* GraphViewController.m in Sources */,
+				2F37F42E138314F60086D467 /* GraphTests.m in Sources */,
+				2F37F4331386DD530086D467 /* UIView+DrawHelp.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

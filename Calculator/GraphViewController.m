@@ -11,6 +11,7 @@
 
 @interface GraphViewController ()
 @property (retain,nonatomic) CGFloat (^cachedFunctionOfX)(CGFloat);
+- (void) addRecognizerOfClass:(Class)recogClass forSEL:(SEL)sel;
 @end
 
 
@@ -21,8 +22,8 @@
 
 
 - (void) dealloc {
-    self.graphView = nil;
-    self.cachedFunctionOfX = nil;
+    [graphView release];
+    [cachedFunctionOfX release];
     [super dealloc];
 }
 
@@ -38,7 +39,13 @@
 
 - (void) viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+
+    [self addRecognizerOfClass:[UIPanGestureRecognizer class]
+                        forSEL:@selector(handlePan:)
+    ];
+    [self addRecognizerOfClass:[UIPinchGestureRecognizer class]
+                        forSEL:@selector(handlePinch:)
+    ];
 }
 
 
@@ -68,13 +75,47 @@
 }
 
 
-- (IBAction) zoomIn {
-    graphView.widthScaled /= 1.5;
+- (void) handlePan:(UIPanGestureRecognizer*)recog {
+    if (
+        recog.state == UIGestureRecognizerStateChanged  ||
+        recog.state == UIGestureRecognizerStateEnded
+    ) {
+        //  Note any change in translation.
+        CGPoint moved = [recog translationInView:graphView];
+        graphView.originNotScaled = CGPointMake(
+            graphView.originNotScaled.x + moved.x,
+            graphView.originNotScaled.y + moved.y
+        );
+
+        //  Reset translation to (0,0) so we'll see only the change next time.
+        [recog setTranslation:CGPointZero inView:graphView];
+    }
 }
 
 
-- (IBAction) zoomOut {
-    graphView.widthScaled *= 1.5;
+- (void) handlePinch:(UIPinchGestureRecognizer*)recog {
+    if (
+        recog.state == UIGestureRecognizerStateChanged  ||
+        recog.state == UIGestureRecognizerStateEnded
+    ) {
+        //  Note any change in scale.
+        graphView.widthScaled /= [recog scale];
+
+        //  Reset scale to 1 so we'll see only the change next time.
+        recog.scale = 1.0;
+    }
+}
+
+
+#pragma mark - Private methods
+
+
+- (void) addRecognizerOfClass:(Class)recogClass forSEL:(SEL)sel {
+    UIGestureRecognizer* recog = [[recogClass alloc]
+        initWithTarget:self action:sel
+    ];
+    [self.view addGestureRecognizer:recog];
+    [recog release];
 }
 
 

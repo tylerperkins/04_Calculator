@@ -11,11 +11,11 @@
 
 @interface GraphViewController : UIViewController <GraphDataDelegate> {
 }
-@property (nonatomic,retain) IBOutlet GraphView*            graphView;
-@property (assign)           IBOutlet id<GraphDataDelegate> delegate;
+@property (nonatomic,retain) IBOutlet GraphView*                graphView;
+@property (assign)           IBOutlet id<GraphDataDelegate>     delegate;
 
-- (IBAction) zoomIn;
-- (IBAction) zoomOut;
-- (CGFloat (^)(CGFloat)) functionOfX;  // Impl. protocol GraphDataDelegate.
+- (CGFloat (^)(CGFloat)) functionOfX;  // Implements proto. GraphDataDelegate.
+- (void) handlePan:(UIPanGestureRecognizer*)recog;
+- (void) handlePinch:(UIPinchGestureRecognizer*)recog;
 
 @end

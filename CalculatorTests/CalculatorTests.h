@@ -11,7 +11,6 @@
 
 
 @interface CalculatorTests : SenTestCase {
-@private
     CalculatorViewController* calculatorViewController;
     NSDictionary* buttons;
 }
