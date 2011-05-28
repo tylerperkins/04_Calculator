@@ -8,6 +8,8 @@
 
 #import "GraphViewController.h"
 
+//  self.view is actually a GraphView, assigned in GraphViewController.xib.
+#define SELF_VIEW ((GraphView*)self.view)
 
 @interface GraphViewController ()
 @property (retain,nonatomic) CGFloat (^cachedFunctionOfX)(CGFloat);
@@ -18,11 +20,10 @@
 @implementation GraphViewController
 
 
-@synthesize graphView, delegate, cachedFunctionOfX;
+@synthesize delegate, cachedFunctionOfX;
 
 
 - (void) dealloc {
-    [graphView release];
     [cachedFunctionOfX release];
     [super dealloc];
 }
@@ -50,7 +51,6 @@
 
 
 - (void) viewDidUnload {
-    self.graphView = nil;
     self.cachedFunctionOfX = nil;
     [super viewDidUnload];
 }
@@ -58,7 +58,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     self.cachedFunctionOfX = nil;
-    [self.graphView setNeedsDisplay];
+    [SELF_VIEW setNeedsDisplay];
 }
 
 
@@ -67,12 +67,7 @@
 }
 
 
-- (CGFloat (^)(CGFloat)) functionOfX {
-    if ( ! self.cachedFunctionOfX ) {
-        self.cachedFunctionOfX = [delegate functionOfX];
-    }
-    return  self.cachedFunctionOfX;
-}
+#pragma mark - Gesture handlers
 
 
 - (void) handlePan:(UIPanGestureRecognizer*)recog {
@@ -81,14 +76,14 @@
         recog.state == UIGestureRecognizerStateEnded
     ) {
         //  Note any change in translation.
-        CGPoint moved = [recog translationInView:graphView];
-        graphView.originNotScaled = CGPointMake(
-            graphView.originNotScaled.x + moved.x,
-            graphView.originNotScaled.y + moved.y
+        CGPoint moved = [recog translationInView:SELF_VIEW];
+        SELF_VIEW.originNotScaled = CGPointMake(
+            SELF_VIEW.originNotScaled.x + moved.x,
+            SELF_VIEW.originNotScaled.y + moved.y
         );
 
         //  Reset translation to (0,0) so we'll see only the change next time.
-        [recog setTranslation:CGPointZero inView:graphView];
+        [recog setTranslation:CGPointZero inView:SELF_VIEW];
     }
 }
 
@@ -99,11 +94,45 @@
         recog.state == UIGestureRecognizerStateEnded
     ) {
         //  Note any change in scale.
-        graphView.widthScaled /= [recog scale];
+        SELF_VIEW.widthScaled /= [recog scale];
 
         //  Reset scale to 1 so we'll see only the change next time.
         recog.scale = 1.0;
     }
+}
+
+
+#pragma mark - Implmentation of protocol GraphDataDelegate
+
+
+- (CGFloat (^)(CGFloat)) functionOfX {
+    if ( ! self.cachedFunctionOfX ) {
+        self.cachedFunctionOfX = [delegate functionOfX];
+    }
+    return  self.cachedFunctionOfX;
+}
+
+
+
+#pragma mark - Implmentation of protocol UISplitViewControllerDelegate
+
+
+- (void) splitViewController:(UISplitViewController*) svc
+      willHideViewController:(UINavigationController*)leftNavController
+           withBarButtonItem:(UIBarButtonItem*)       barButtonItem
+        forPopoverController:(UIPopoverController*)   pc
+{
+    barButtonItem.title =
+        leftNavController.topViewController.navigationItem.title;
+    self.navigationItem.leftBarButtonItem = barButtonItem;
+}
+
+
+- (void) splitViewController:(UISplitViewController*)svc
+      willShowViewController:(UIViewController*)     calcViewController
+   invalidatingBarButtonItem:(UIBarButtonItem*)      barButtonItem
+{
+    self.navigationItem.leftBarButtonItem = nil;
 }
 
 
@@ -114,7 +143,7 @@
     UIGestureRecognizer* recog = [[recogClass alloc]
         initWithTarget:self action:sel
     ];
-    [self.view addGestureRecognizer:recog];
+    [SELF_VIEW addGestureRecognizer:recog];
     [recog release];
 }
 

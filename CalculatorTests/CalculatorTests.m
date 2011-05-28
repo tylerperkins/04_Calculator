@@ -55,6 +55,7 @@ NSDictionary* newDictOfButtonsByTitleInView( UIView* view );
     CGFloat (^f)(CGFloat);
 
     [self pushButtonWithTitle:@"3"];
+    [self pushButtonWithTitle:@"="];
     f = [calculatorViewController functionOfX];
     STAssertEquals( f(-1.0), (CGFloat)3.0, @"operation 3" );
     STAssertEquals( f( 0.0), (CGFloat)3.0, @"operation 3" );
@@ -131,9 +132,10 @@ NSDictionary* newDictOfButtonsByTitleInView( UIView* view );
     [self pushButtonWithTitle:@"*"];
     [self pushButtonWithTitle:@"1"];
     [self pushButtonWithTitle:@"sqrt"];
+    [self pushButtonWithTitle:@"="];
     STAssertTrue(
         [calculatorViewController.display.text
-            isEqual:@" x * 1 sqrt"
+            isEqual:@" x * 1 sqrt ="
         ],
         @"display string"
     );

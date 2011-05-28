@@ -9,10 +9,6 @@
 #import "GraphView.h"
 #import "AxesDrawer.h"
 
-@interface GraphView ()
-- (void) plotFunction:(CGFloat (^)(CGFloat))f;
-@end
-
 
 @implementation GraphView
 
@@ -21,6 +17,7 @@
 
 
 - (void)awakeFromNib {
+    self.contentMode = UIViewContentModeRedraw;
     widthScaled = 10.0;
     originNotScaled =
         CGPointMake(self.bounds.size.width/2.0, self.bounds.size.height/2.0);
@@ -28,7 +25,7 @@
 
 
 /*  In the given context, draws the given function of CGFloat -> CGFloat.
- */
+*/
 void plot(
           CGContextRef context,
           CGFloat      (^f)(CGFloat),  // Block calculating f(x).
@@ -63,7 +60,6 @@ void plot(
 
 
 - (void) drawRect:(CGRect)rect {
-
     CGFloat axesThicknessInPoints = 1.0;
     CGFloat plotThicknessInPoints = 2.0;
 
@@ -105,11 +101,6 @@ void plot(
 }
 
 
-- (void) drawRect_NEW:(CGRect)rect {
-    
-}
-
-
 - (void) setWidthScaled:(CGFloat)newWidthScaled {
     widthScaled = newWidthScaled;
     [self setNeedsDisplay];
@@ -119,14 +110,6 @@ void plot(
 - (void) setOriginNotScaled:(CGPoint)newOriginNotScaled {
     originNotScaled = newOriginNotScaled;
     [self setNeedsDisplay];
-}
-
-
-#pragma mark - Private methods and functions
-
-
-- (void) plotFunction:(CGFloat (^)(CGFloat))f {
-    
 }
 
 

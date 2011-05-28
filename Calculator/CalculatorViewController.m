@@ -38,6 +38,13 @@
 #pragma mark - View lifecycle
 
 
+- (void) viewDidLoad {
+    //  In case we're in a UISplitViewController, we define the size of the
+    //  popover that displays when the user touches the left bar button.
+    self.contentSizeForViewInPopover = CGSizeMake(320.0, 480.0);
+}
+
+
 - (void) viewDidUnload {
     [self releaseGUIOutlets];
     [super viewDidUnload];
@@ -195,9 +202,20 @@
 
 
 - (IBAction) graphPressed {
-    [self.navigationController pushViewController:self.graphViewController
-                                         animated:YES
-    ];
+    //  Ensure the expression is terminated by '='.
+    if ( ! [brain.expression isComplete] ) {
+        [self equalsPressed:equalsButton];
+    }
+    
+    if ( self.splitViewController ) {
+        self.graphViewController.navigationItem.title = display.text;
+        [self.graphViewController viewWillAppear:NO];  // (NO animation.)
+
+    } else {
+        [self.navigationController pushViewController:self.graphViewController
+                                             animated:YES
+        ];
+    }
 }
 
 
@@ -209,11 +227,6 @@
     where the variable is "x".
 */
 - (CGFloat (^)(CGFloat)) functionOfX {
-    //  Ensure the expression is terminated by '='.
-    if ( ! [brain.expression isComplete] ) {
-        [self equalsPressed:equalsButton];
-    }
-
     //  Note that these objects must be autoreleased, since references to
     //  them are kept by the returned block, which itself is autoreleased.
     //
