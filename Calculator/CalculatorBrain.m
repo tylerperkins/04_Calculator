@@ -6,6 +6,11 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+/*  This is the model for the Calculator application. It does the actual
+    calculation. It is also responsible for recording expressions containing
+    variables and later evaluating them.
+*/
+
 #import "CalculatorBrain.h"
 #import <math.h>
 

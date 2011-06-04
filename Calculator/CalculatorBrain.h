@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "Expression.h"
 
-typedef num  (^unaryOperation)(num);
+typedef num (^unaryOperation )(num);
 typedef num (^binaryOperation)(num,num);
 
 @interface CalculatorBrain : NSObject {
@@ -17,9 +17,7 @@ typedef num (^binaryOperation)(num,num);
     num             memory;
     binaryOperation pendingOp;
 }
-
-@property (readonly,nonatomic) num result;
-
+@property (readonly,nonatomic) num         result;
 @property (readonly,nonatomic) Expression* expression;
 
 - (void) negateOperand:   (NSString*)oprnd  glyph:(NSString*)glyph;

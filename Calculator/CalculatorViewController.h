@@ -10,9 +10,7 @@
 #import "CalculatorBrain.h"
 #import "GraphViewController.h"
 
-@interface CalculatorViewController : UIViewController <GraphDataDelegate> {
-    BOOL userIsInTheMiddleOfTypingANumber;
-}
+@interface CalculatorViewController : UIViewController <GraphDataDelegate> {}
 @property (nonatomic,retain) IBOutlet UILabel*             display;
 @property (nonatomic,retain) IBOutlet UIButton*            equalsButton;
 @property (nonatomic,retain) IBOutlet CalculatorBrain*     brain;

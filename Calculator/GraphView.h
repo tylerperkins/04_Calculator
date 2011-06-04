@@ -13,12 +13,20 @@
 - (CGFloat (^)(CGFloat)) functionOfX;
 @end
 
-CGFloat lineWidthScale( CGPoint p1, CGPoint p2, CGAffineTransform trans );
+@interface GraphView : UIView {}
 
-@interface GraphView : UIView {
-}
+//  We don't need to retain the delegate, because we're sure this GraphView
+//  will be released before the delegate is, which is the GraphViewController.
 @property (assign,nonatomic) IBOutlet id<GraphDataDelegate> delegate;
-@property (assign,nonatomic)          CGFloat               widthScaled;
-@property (assign,nonatomic)          CGPoint               originNotScaled;
+
+//  Note that we don't retain these CGAffineTransforms because they are not
+//  pointers. They are just the numerical state of the GraphView instance.
+@property (assign,nonatomic) CGAffineTransform coordSys;
+@property (assign,nonatomic) CGAffineTransform coordSysInverse;
+
+- (CGAffineTransform) initialCoordSys;
+- (CGAffineTransform) translateToMiddle;
+- (CGAffineTransform) dilationAtMiddleWithScaleX:(CGFloat)scaleX
+                                               y:(CGFloat)scaleY;
 
 @end

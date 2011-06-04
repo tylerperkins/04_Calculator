@@ -6,13 +6,22 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+/*  This view controller manages the calculator's buttons and display. It
+    hands off calculation to model CalculatorBrain, and graphical display
+    to GraphViewController. It conforms to protocol GraphDataDelegate, so
+    it knows how to wrap the current numerical state of an expression of
+    one variable, and provide it to the GraphViewController as an anonymous
+    function. It also handles the distinct requirements of iPad and iPhone.
+*/
+
 #import "CalculatorViewController.h"
 
 /*  Private method interfaces. Here, a nameless class extension (like a
     category declaration) is used just to declare the private methods.
 */
 @interface CalculatorViewController ()  // (Could've named it, but unneces.)
-@property (nonatomic,retain) NSString* operandToSubmit;
+@property (assign,nonatomic) BOOL      userIsInTheMiddleOfTypingANumber;
+@property (copy,nonatomic)   NSString* operandToSubmit;
 - (void) reset;
 - (void) show:(NSString*)str;
 - (void) showResult;
@@ -21,16 +30,21 @@
 
 
 @implementation CalculatorViewController
-@synthesize equalsButton;
 
 
-@synthesize display,brain,graphViewController,operandToSubmit;
+@synthesize
+    display,
+    equalsButton,
+    brain,
+    graphViewController,
+    operandToSubmit,
+    userIsInTheMiddleOfTypingANumber;
 
 
 - (void) dealloc {
     [self releaseGUIOutlets];
-    self.brain =  nil;
-    self.operandToSubmit = nil;
+    [brain release];
+    [operandToSubmit release];
     [super dealloc];
 }
 
@@ -62,7 +76,7 @@
 - (IBAction) digitPressed:(UIButton*)bttn {
     NSString* digit = bttn.currentTitle;
 
-	if ( userIsInTheMiddleOfTypingANumber ) {
+	if ( self.userIsInTheMiddleOfTypingANumber ) {
         NSString* oldText = display.text;
         //  Remove a leading "0", preserving "-", if present.
         if      ( [oldText isEqualToString:@"0" ] )  oldText = @"";
@@ -72,13 +86,13 @@
 
     } else {
         [self show:digit];
-        userIsInTheMiddleOfTypingANumber = YES;
+        self.userIsInTheMiddleOfTypingANumber = YES;
     }
 }
 
 
 - (IBAction) decimalPointPressed:(UIButton*)bttn {
-	if ( userIsInTheMiddleOfTypingANumber ) {
+	if ( self.userIsInTheMiddleOfTypingANumber ) {
         //  Check to see if a decimal point has already been entered.
         NSString* ptStr = bttn.currentTitle;
         if ( [display.text rangeOfString:ptStr].length == 0 ) {
@@ -87,20 +101,20 @@
     } else {
         //  New number. Prefix with "0.".
         [self show:@"0."];
-        userIsInTheMiddleOfTypingANumber = YES;
+        self.userIsInTheMiddleOfTypingANumber = YES;
     }
 }
 
 
 - (IBAction)variablePressed:(UIButton*)sender {
     [self show:sender.titleLabel.text];
-    userIsInTheMiddleOfTypingANumber = NO;
+    self.userIsInTheMiddleOfTypingANumber = NO;
 }
 
 
 - (IBAction) negatePressed:(UIButton*)bttn {
 
-    if ( userIsInTheMiddleOfTypingANumber ) {
+    if ( self.userIsInTheMiddleOfTypingANumber ) {
         //  Just prepend a "-" to entered string if not already present,
         //  or remove it if it is present.
 
@@ -256,7 +270,7 @@
     //  Initialize, but don't mess with outlets. This provides a convenient
     //  way to reset the calculator to its original state.
     [self show:@"0"];
-    userIsInTheMiddleOfTypingANumber = NO;
+    self.userIsInTheMiddleOfTypingANumber = NO;
 }
 
 
@@ -287,14 +301,14 @@
         [self show:[NSString stringWithFormat:@"%g", brain.result]];
     }
 
-    userIsInTheMiddleOfTypingANumber = NO;
+    self.userIsInTheMiddleOfTypingANumber = NO;
 }
 
 
 - (void) releaseGUIOutlets {
-    self.display = nil;
-    self.equalsButton = nil;
-    self.graphViewController = nil;
+    [display release];
+    [equalsButton release];
+    [graphViewController release];
 }
 
 

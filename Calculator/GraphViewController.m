@@ -6,6 +6,15 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+/*  This view controller manages the display of a plot of a particular function
+    of one variable in its GraphView. It conforms to protocol
+    GraphDataDelegate and thus provides a function to plot to its GraphView.
+    The function is cached when obtained from another GraphDataDelegate, the
+    CalculatorViewController. This class also conforms to
+    UISplitViewControllerDelegate, so handles the shift in the center of the
+    view when the use changes from portrait to landscape mode, or vice versa.
+*/
+
 #import "GraphViewController.h"
 
 //  self.view is actually a GraphView, assigned in GraphViewController.xib.
@@ -13,17 +22,18 @@
 
 @interface GraphViewController ()
 @property (retain,nonatomic) CGFloat (^cachedFunctionOfX)(CGFloat);
-- (void) addRecognizerOfClass:(Class)recogClass forSEL:(SEL)sel;
+@property (assign,nonatomic) CGSize  sizeBeforeRotation;
 @end
 
 
 @implementation GraphViewController
 
 
-@synthesize delegate, cachedFunctionOfX;
+@synthesize delegate, cachedFunctionOfX, sizeBeforeRotation;
 
 
 - (void) dealloc {
+    [delegate release];
     [cachedFunctionOfX release];
     [super dealloc];
 }
@@ -38,18 +48,6 @@
 #pragma mark - View lifecycle
 
 
-- (void) viewDidLoad {
-    [super viewDidLoad];
-
-    [self addRecognizerOfClass:[UIPanGestureRecognizer class]
-                        forSEL:@selector(handlePan:)
-    ];
-    [self addRecognizerOfClass:[UIPinchGestureRecognizer class]
-                        forSEL:@selector(handlePinch:)
-    ];
-}
-
-
 - (void) viewDidUnload {
     self.cachedFunctionOfX = nil;
     [super viewDidUnload];
@@ -57,7 +55,13 @@
 
 
 - (void)viewWillAppear:(BOOL)animated {
+    //  Force retrieval of the function from CalculatorViewController.
     self.cachedFunctionOfX = nil;
+
+    //  We'll need these view dimensions when user changes device orientation.
+    self.sizeBeforeRotation = SELF_VIEW.bounds.size;
+
+    //  Function or split view may have changed. Re-plot.
     [SELF_VIEW setNeedsDisplay];
 }
 
@@ -67,37 +71,30 @@
 }
 
 
-#pragma mark - Gesture handlers
-
-
-- (void) handlePan:(UIPanGestureRecognizer*)recog {
+- (void) didRotateFromInterfaceOrientation:(UIInterfaceOrientation)ornt {
     if (
-        recog.state == UIGestureRecognizerStateChanged  ||
-        recog.state == UIGestureRecognizerStateEnded
+        UIInterfaceOrientationIsLandscape(self.interfaceOrientation) !=
+        UIInterfaceOrientationIsLandscape(ornt)
     ) {
-        //  Note any change in translation.
-        CGPoint moved = [recog translationInView:SELF_VIEW];
-        SELF_VIEW.originNotScaled = CGPointMake(
-            SELF_VIEW.originNotScaled.x + moved.x,
-            SELF_VIEW.originNotScaled.y + moved.y
+        //  User changed from a portrait orientation (possibly upside-down)
+        //  to a landscape orientation (pointed left or right), or vice versa.
+        //  Calculate the displacement of the middle of the view in points.
+        CGFloat shiftX = (
+            SELF_VIEW.bounds.size.width - self.sizeBeforeRotation.width
+        )/2.0;
+        CGFloat shiftY = (
+            SELF_VIEW.bounds.size.height - self.sizeBeforeRotation.height
+        )/2.0;
+
+        //  Modify the view's coordSys by composing it to a translation of
+        //  the amount of the displacement.
+        SELF_VIEW.coordSys = CGAffineTransformConcat(
+            SELF_VIEW.coordSys,
+            CGAffineTransformMakeTranslation(shiftX, shiftY)
         );
 
-        //  Reset translation to (0,0) so we'll see only the change next time.
-        [recog setTranslation:CGPointZero inView:SELF_VIEW];
-    }
-}
-
-
-- (void) handlePinch:(UIPinchGestureRecognizer*)recog {
-    if (
-        recog.state == UIGestureRecognizerStateChanged  ||
-        recog.state == UIGestureRecognizerStateEnded
-    ) {
-        //  Note any change in scale.
-        SELF_VIEW.widthScaled /= [recog scale];
-
-        //  Reset scale to 1 so we'll see only the change next time.
-        recog.scale = 1.0;
+        //  Save dimensions for the next call.
+        self.sizeBeforeRotation = SELF_VIEW.bounds.size;
     }
 }
 
@@ -106,6 +103,7 @@
 
 
 - (CGFloat (^)(CGFloat)) functionOfX {
+    //  Just used cached function, if possible.
     if ( ! self.cachedFunctionOfX ) {
         self.cachedFunctionOfX = [delegate functionOfX];
     }
@@ -122,8 +120,13 @@
            withBarButtonItem:(UIBarButtonItem*)       barButtonItem
         forPopoverController:(UIPopoverController*)   pc
 {
+    //  User rotated device to portrait mode.
+
+    //  Use the title on the right nav. controller for button's title.
     barButtonItem.title =
         leftNavController.topViewController.navigationItem.title;
+
+    //  Set the right nav. controller's left bar button to be the given one.
     self.navigationItem.leftBarButtonItem = barButtonItem;
 }
 
@@ -132,19 +135,10 @@
       willShowViewController:(UIViewController*)     calcViewController
    invalidatingBarButtonItem:(UIBarButtonItem*)      barButtonItem
 {
+    //  User rotated device to landscape mode.
+
+    //  Remove the button item of the right nav. controller.
     self.navigationItem.leftBarButtonItem = nil;
-}
-
-
-#pragma mark - Private methods
-
-
-- (void) addRecognizerOfClass:(Class)recogClass forSEL:(SEL)sel {
-    UIGestureRecognizer* recog = [[recogClass alloc]
-        initWithTarget:self action:sel
-    ];
-    [SELF_VIEW addGestureRecognizer:recog];
-    [recog release];
 }
 
 

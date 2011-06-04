@@ -11,12 +11,9 @@
 
 @interface GraphViewController : UIViewController
     <GraphDataDelegate, UISplitViewControllerDelegate>
-{
-}
-@property (assign)           IBOutlet id<GraphDataDelegate>     delegate;
+{}
+@property (retain,nonatomic) IBOutlet id<GraphDataDelegate> delegate;
 
 - (CGFloat (^)(CGFloat)) functionOfX;  // Implements proto. GraphDataDelegate.
-- (void) handlePan:(UIPanGestureRecognizer*)recog;
-- (void) handlePinch:(UIPinchGestureRecognizer*)recog;
 
 @end
