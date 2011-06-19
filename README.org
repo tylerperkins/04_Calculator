@@ -13,9 +13,9 @@ In retrospect, I think it would have been simpler to explicitly transform the dr
 
 *Handles double- and triple-taps.* A double-tap translates the graph so the origin is at the middle of the view. A triple-tap restores the default coordinate system, which also happens to have the origin at the middle. The effect is that when the double-taps, he sees the graph shift to the middle, and on the third tap, the scale returns to the default.
 
-*Can run on the iPad.* Notice that very little of my code needs to know which platform it's running in -- less than that in Paul Hegarty's demo. Only method =graphPressed= has to decide whether to push the =graphViewController= or just redraw the graph in the view already showing. This is in keeping with my goal of doing as much initialization in Interface Builder as possible. I found myself a bit "off the map", however, when it came to using Xcode 4 to pull it this together, as explained below.
+*Can run on the iPad.* Notice that very little of my code needs to know which platform it's running in -- less than that in Paul Hegarty's demo. Method =graphPressed= has to decide whether to push the =graphViewController= or just redraw the graph in the view already showing, and method =restoreFromUserDefaults:= has to redraw the graph if we're on the iPad. That's it! This is in keeping with my goal of doing as much initialization in Interface Builder as possible. I found myself a bit "off the map", however, when it came to using Xcode 4 to pull it this together, as explained below.
 
-*Saves and restores state* Nearly the entire state of the calculator is persisted using NSUserDefaults. Even if the user is in the process of entering a number or has not completed a calculation, the user is returned exactly to where he/she left off. This is hard to see using the simulator. Look instead at the unit tests in CalculatorTests.m. 
+*Saves and restores state* Nearly the entire state of the calculator is persisted using NSUserDefaults. Even if the user is in the process of entering a number or has not completed a calculation, the user is returned exactly to where he/she left off. This is hard to see using the simulator. Look instead at the unit tests in CalculatorTests.m.
 
 *** Hurdles surmounted
 
