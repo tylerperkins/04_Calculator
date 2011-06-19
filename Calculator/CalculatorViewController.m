@@ -25,6 +25,7 @@
 - (void) reset;
 - (void) show:(NSString*)str;
 - (void) showResult;
+- (void) drawRightView;
 - (void) releaseGUIOutlets;
 @end
 
@@ -222,9 +223,7 @@
     }
     
     if ( self.splitViewController ) {
-        self.graphViewController.navigationItem.title = display.text;
-        [self.graphViewController viewWillAppear:NO];  // (NO animation.)
-
+        [self drawRightView];
     } else {
         [self.navigationController pushViewController:self.graphViewController
                                              animated:YES
@@ -246,7 +245,8 @@
     //
     id plist                     =
       [CalculatorBrain propertyListForExpression:brain.expression];
-    CalculatorBrain* brn         = [[CalculatorBrain new] autorelease];
+    num memoryWhenFuncCreated    = self.brain.memory;
+    CalculatorBrain* brn         = [[CalculatorBrain alloc] autorelease];
     NSMutableDictionary* binding =
       [NSMutableDictionary dictionaryWithCapacity:1];
 
@@ -254,10 +254,53 @@
         [binding setValue:[NSString stringWithFormat:@"%g", x]
                    forKey:@"x"
         ];
+        [brn init];
+        brn.memory = memoryWhenFuncCreated;
         [CalculatorBrain runPlist:plist inBrain:brn withBindings:binding];
         return [brn.expression hasVariables] ? NAN : brn.result;
 
     } copy] autorelease];
+}
+
+
+#pragma mark - Implmentation of protocol SavesAndRestoresDefaults
+
+
+/*  This is the central method for saving the user defaults for
+    the entire application.
+*/
+- (void) saveToUserDefaults:(NSUserDefaults*)defaults {
+    clearAppDefaults(defaults);
+
+    if ( userIsInTheMiddleOfTypingANumber ) {
+        [defaults setObject:display.text forKey:defaultKey(Typing)];
+    }
+
+    [self.brain saveToUserDefaults:defaults];
+
+    [graphViewController saveToUserDefaults:defaults];
+
+    [defaults setBool:YES forKey:defaultKey(HaveSavedValues)];
+}
+
+
+/*  This is the central method for restoring the user defaults for
+    the entire application.
+*/
+- (void) restoreFromUserDefaults:(NSUserDefaults*)defaults {
+    if ( [defaults boolForKey:defaultKey( HaveSavedValues )] ) {
+
+        [graphViewController restoreFromUserDefaults:defaults];
+
+        [self.brain restoreFromUserDefaults:defaults];
+
+        NSString* typing = [defaults stringForKey:defaultKey(Typing)];
+        if ( typing )  [self show:typing];
+        else           [self showResult];
+        self.userIsInTheMiddleOfTypingANumber = ( typing != nil );
+
+        if ( self.splitViewController )  [self drawRightView];
+    }
 }
 
 
@@ -267,8 +310,7 @@
 /*  Sets this instance to its original state.
 */
 - (void) reset {
-    //  Initialize, but don't mess with outlets. This provides a convenient
-    //  way to reset the calculator to its original state.
+    //  Initialize, but don't mess with outlets.
     [self show:@"0"];
     self.userIsInTheMiddleOfTypingANumber = NO;
 }
@@ -302,6 +344,12 @@
     }
 
     self.userIsInTheMiddleOfTypingANumber = NO;
+}
+
+
+- (void) drawRightView {
+    self.graphViewController.navigationItem.title = display.text;
+    [self.graphViewController viewWillAppear:NO];  // (NO animation.)
 }
 
 

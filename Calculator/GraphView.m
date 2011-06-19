@@ -20,25 +20,29 @@
 #import "GraphView.h"
 #import "AxesDrawer.h"
 
-static const CGFloat AxesThicknessInPoints = 1.0;
-static const CGFloat PlotThicknessInPoints = 2.0;
+static CGFloat const AxesThicknessInPoints = 1.0;
+static CGFloat const PlotThicknessInPoints = 2.0;
 
 @interface GraphView ()
-@property (assign,nonatomic) BOOL hasCoordSys;
+- (CGAffineTransform) initialCoordSys;
+- (CGAffineTransform) translateToMiddle;
+- (CGAffineTransform) dilationAtMiddleWithScaleX:(CGFloat)scaleX
+                                               y:(CGFloat)scaleY;
 - (UIGestureRecognizer*) addRecognizerOfClass:(Class)recogClass
                                        forSEL:(SEL)sel;
+- (void) plotFunction:(CGFloat (^)(CGFloat))f inContext:(CGContextRef)context;
+
 - (void) handlePan:(UIPanGestureRecognizer*)recog;
 - (void) handlePinch:(UIPinchGestureRecognizer*)recog;
 - (void) handle2Taps:(UIPinchGestureRecognizer*)recog;
 - (void) handle3Taps:(UIPinchGestureRecognizer*)recog;
-- (void) plotFunction:(CGFloat (^)(CGFloat))f inContext:(CGContextRef)context;
 @end
 
 
 @implementation GraphView
 
 
-@synthesize delegate, coordSys, coordSysInverse, hasCoordSys;
+@synthesize delegate, coordSys, coordSysInverse;
 
 
 - (void)awakeFromNib {
@@ -69,12 +73,6 @@ static const CGFloat PlotThicknessInPoints = 2.0;
 
 
 - (void) drawRect:(CGRect)rect {
-    if ( ! self.hasCoordSys ) {
-        //  First time here, so we must initialize coordSys.
-        self.coordSys = [self initialCoordSys];
-        self.hasCoordSys = YES;
-    }
-
     CGContextRef context = UIGraphicsGetCurrentContext();
 
     //  Draw the axes with labels BEFORE we change the CTM below. Class
@@ -98,6 +96,32 @@ static const CGFloat PlotThicknessInPoints = 2.0;
 }
 
 
+/*  Tells whether a coordinate system has been defined for this view.
+    This will be the case only after self.coordSys is used, which happens
+    first when drawRect: is called.
+*/
+- (BOOL) hasCoordSys {
+    return  coordSys.a;
+}
+
+
+/*  Accessor for self.coordSys. Note that the returned value is created lazily,
+    because its initial value only makes sense at the time drawRect: is called,
+    when this view's bounds have been set to those shown to the user. In a
+    UISplitViewController at startup, for example, the bounds will likely have
+    different values when this view has been awaken from the NIB, then possibly
+    after layout in vertical orientation, then possibly rotated to horizontal
+    orientation, then finally just before it is drawn.
+*/
+- (CGAffineTransform) coordSys {
+    if ( ! [self hasCoordSys] ) {
+        //  First time here, so we must initialize coordSys.
+        self.coordSys = [self initialCoordSys];
+    }
+    return coordSys;
+}
+
+
 /*  Assigns the coordSys property, caching its inverse too. Also ensures
     that the plot will be redrawn.
 */
@@ -105,6 +129,48 @@ static const CGFloat PlotThicknessInPoints = 2.0;
     coordSys = newTransform;
     coordSysInverse = CGAffineTransformInvert(coordSys);
     [self setNeedsDisplay];
+}
+
+
+#pragma mark - Implmentation of protocol SavesAndRestoresDefaults
+
+
+- (void) saveToUserDefaults:(NSUserDefaults*)defaults {
+    if ( [self hasCoordSys] ) {
+        NSString* key = defaultKey(GraphViewCoordSys);
+        NSData* coordSysData = [NSData dataWithBytes:&coordSys
+                                              length:sizeof(coordSys)
+                               ];
+        [defaults setObject:coordSysData forKey:key];
+    }
+}
+
+
+- (void) restoreFromUserDefaults:(NSUserDefaults*)defaults {
+    NSData* coordSysData = [defaults dataForKey:defaultKey(GraphViewCoordSys)];
+    if ( coordSysData ) {
+        self.coordSys = *(CGAffineTransform*)[coordSysData bytes];
+    }
+}
+
+
+#pragma mark - Private methods and functions
+
+
+/*  Generates the affine transformation initially used for drawing, until the
+    user uses a gesture to pan or pinch the screen. The returned transformation
+    is scaled to show a graph from x == -5 to x == 5. Its y-scale defaults to
+    be the same as the x-scale.
+*/
+- (CGAffineTransform) initialCoordSys {
+    CGFloat scale = self.bounds.size.width/10.0;  // Points per unit.
+
+    return  CGAffineTransformConcat(
+        CGAffineTransformMakeScale(scale, -scale),
+        CGAffineTransformMakeTranslation(
+            self.bounds.size.width/2.0, self.bounds.size.height/2.0
+        )
+    );
 }
 
 
@@ -141,90 +207,6 @@ static const CGFloat PlotThicknessInPoints = 2.0;
         CGAffineTransformConcat(
             CGAffineTransformMakeScale(scaleX, scaleY),
             toMiddle
-        )
-    );
-}
-
-
-#pragma mark - Gesture handlers
-
-
-- (void) handlePan:(UIPanGestureRecognizer*)recog {
-    if (
-        recog.state == UIGestureRecognizerStateChanged  ||
-        recog.state == UIGestureRecognizerStateEnded
-    ) {
-        CGPoint moved = [recog translationInView:self];
-        
-        //  Modify coordSys by shifting its result.
-        self.coordSys = CGAffineTransformConcat(
-            self.coordSys,
-            CGAffineTransformMakeTranslation(moved.x, moved.y)
-        );
-        
-        //  Reset translation to (0,0) so we'll see only the change next time.
-        [recog setTranslation:CGPointZero inView:self];
-    }
-}
-
-
-- (void) handlePinch:(UIPinchGestureRecognizer*)recog {
-    if (
-        recog.state == UIGestureRecognizerStateChanged  ||
-        recog.state == UIGestureRecognizerStateEnded
-    ) {
-        //  Apply a possibly off-center dilation as input to coordSys.
-        self.coordSys = CGAffineTransformConcat(
-            [self dilationAtMiddleWithScaleX:recog.scale y:recog.scale],
-            self.coordSys
-        );
-        
-        //  Reset scale to 1 so we'll see only the change next time.
-        recog.scale = 1.0;
-    }
-}
-
-
-- (void) handle2Taps:(UIPinchGestureRecognizer*)recog {
-    if (
-        recog.state == UIGestureRecognizerStateChanged  ||
-        recog.state == UIGestureRecognizerStateEnded
-    ) {
-        CGAffineTransform toMiddle = [self translateToMiddle];
-        
-        //  Change view's coordSys to one whose origin is at the middle
-        //  of the view.
-        self.coordSys = CGAffineTransformConcat( toMiddle, self.coordSys );
-    }
-}
-
-
-- (void) handle3Taps:(UIPinchGestureRecognizer*)recog {
-    if (
-        recog.state == UIGestureRecognizerStateChanged  ||
-        recog.state == UIGestureRecognizerStateEnded
-    ) {
-        //  Change the view's coordSys back to the original one.
-        self.coordSys = [self initialCoordSys];
-    }
-}
-
-
-#pragma mark - Private methods and functions
-
-
-/*  Generates the affine transformation initially used for drawing, until the
-    user uses a gesture to pan or pinch the screen. The returned transformation
-    is scaled to show a graph from x == -5 to x == 5. Its y-scale defaults to
-    be the same as the x-scale.
-*/
-- (CGAffineTransform) initialCoordSys {
-    CGFloat scale = self.bounds.size.width/10.0;  // Points per unit.
-
-    return  CGAffineTransformConcat(
-        CGAffineTransformMakeScale(scale, -scale),
-        CGAffineTransformMakeTranslation(
-            self.bounds.size.width/2.0, self.bounds.size.height/2.0
         )
     );
 }
@@ -301,6 +283,70 @@ static const CGFloat PlotThicknessInPoints = 2.0;
         lastYWasNAN = thisYWasNAN;
     }
 	CGContextStrokePath(context);
+}
+
+
+#pragma mark - Gesture handlers
+
+
+- (void) handlePan:(UIPanGestureRecognizer*)recog {
+    if (
+        recog.state == UIGestureRecognizerStateChanged  ||
+        recog.state == UIGestureRecognizerStateEnded
+    ) {
+        CGPoint moved = [recog translationInView:self];
+        
+        //  Modify coordSys by shifting its result.
+        self.coordSys = CGAffineTransformConcat(
+            self.coordSys,
+            CGAffineTransformMakeTranslation(moved.x, moved.y)
+        );
+        
+        //  Reset translation to (0,0) so we'll see only the change next time.
+        [recog setTranslation:CGPointZero inView:self];
+    }
+}
+
+
+- (void) handlePinch:(UIPinchGestureRecognizer*)recog {
+    if (
+        recog.state == UIGestureRecognizerStateChanged  ||
+        recog.state == UIGestureRecognizerStateEnded
+    ) {
+        //  Apply a possibly off-center dilation as input to coordSys.
+        self.coordSys = CGAffineTransformConcat(
+            [self dilationAtMiddleWithScaleX:recog.scale y:recog.scale],
+            self.coordSys
+        );
+        
+        //  Reset scale to 1 so we'll see only the change next time.
+        recog.scale = 1.0;
+    }
+}
+
+
+- (void) handle2Taps:(UIPinchGestureRecognizer*)recog {
+    if (
+        recog.state == UIGestureRecognizerStateChanged  ||
+        recog.state == UIGestureRecognizerStateEnded
+    ) {
+        CGAffineTransform toMiddle = [self translateToMiddle];
+        
+        //  Change view's coordSys to one whose origin is at the middle
+        //  of the view.
+        self.coordSys = CGAffineTransformConcat( toMiddle, self.coordSys );
+    }
+}
+
+
+- (void) handle3Taps:(UIPinchGestureRecognizer*)recog {
+    if (
+        recog.state == UIGestureRecognizerStateChanged  ||
+        recog.state == UIGestureRecognizerStateEnded
+    ) {
+        //  Change the view's coordSys back to the original one.
+        self.coordSys = [self initialCoordSys];
+    }
 }
 
 

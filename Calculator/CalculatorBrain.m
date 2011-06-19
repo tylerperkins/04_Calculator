@@ -14,7 +14,7 @@
 #import "CalculatorBrain.h"
 #import <math.h>
 
-NSString* variableValue( NSString* txt, const NSDictionary* bindings );
+NSString* variableValue( NSString* txt, NSDictionary* bindings );
 
 @interface CalculatorBrain ()
 - (void) doOperand:(NSString*)oprnd
@@ -31,7 +31,7 @@ NSString* variableValue( NSString* txt, const NSDictionary* bindings );
 @implementation CalculatorBrain
 
 
-@synthesize result, expression;
+@synthesize memory, result, expression;
 
 
 /*  Initializes this instance to the state of the user having already tapped
@@ -150,7 +150,7 @@ NSString* variableValue( NSString* txt, const NSDictionary* bindings );
 
 - (void) recallOperand:(NSString*)oprnd glyph:(NSString*)glyph {
     [self doOperand:oprnd
-            unaryOp:^(num o2){ return memory; }
+            unaryOp:^(num o2){ return self.memory; }
              caller:@"recallOperand:glyph:"
               glyph:glyph
     ];
@@ -159,7 +159,7 @@ NSString* variableValue( NSString* txt, const NSDictionary* bindings );
 
 - (void) storeOperand:(NSString*)oprnd glyph:(NSString*)glyph {
     [self doOperand:oprnd
-            unaryOp:^(num o2){ return memory = o2; }
+            unaryOp:^(num o2){ return self.memory = o2; }
              caller:@"storeOperand:glyph:"
               glyph:glyph
     ];
@@ -169,12 +169,34 @@ NSString* variableValue( NSString* txt, const NSDictionary* bindings );
 - (void) storePlusOperand:(NSString*)oprnd glyph:(NSString*)glyph {
     [self doOperand:oprnd
             unaryOp:^(num o2){
-                memory += o2;
+                self.memory += o2;
                 return o2;
             }
              caller:@"storePlusOperand:glyph:"
               glyph:glyph
     ];
+}
+
+
+#pragma mark - Implmentation of protocol SavesAndRestoresDefaults
+
+
+- (void) saveToUserDefaults:(NSUserDefaults*)defaults {
+    [defaults setObject:expression.plist forKey:defaultKey(ExpressionPlist)];
+    [defaults setDouble:self.memory forKey:defaultKey(BrainMemory)];
+}
+
+
+- (void) restoreFromUserDefaults:(NSUserDefaults*)defaults {
+    [self init];
+    self.memory = [defaults doubleForKey:defaultKey(BrainMemory)];
+    [CalculatorBrain
+         runPlist:[defaults objectForKey:defaultKey(ExpressionPlist)]
+          inBrain:self
+     withBindings:nil
+    ];
+    //  Note that variableValue(...) is defined so that nil bindings
+    //  results in no substitution of variables being done.
 }
 
 
@@ -204,11 +226,11 @@ NSString* variableValue( NSString* txt, const NSDictionary* bindings );
             caller:(NSString*)selStr
              glyph:(NSString*)glyph
 {
-    if ( ! [Expression isNumString:oprnd] || [expression hasVariables] ) {
+    if ( ! [Expression isNumString:oprnd] || [self.expression hasVariables] ) {
         //  User just entered a variable, or did sometime in the history
         //  of this expression. Just save the args. in existing expr.
 
-        [expression appendSELStr:selStr operandStr:oprnd glyph:glyph];
+        [self.expression appendSELStr:selStr operandStr:oprnd glyph:glyph];
 
     } else {
 
@@ -221,7 +243,7 @@ NSString* variableValue( NSString* txt, const NSDictionary* bindings );
         //  Record the result from the above calculation in expression, along
         //  with the new waiting operation. The resulting expression will be
         //  needed if the user next enters a variable.
-        [[expression init]
+        [[self.expression init]
             appendSELStr:selStr
               operandStr:[NSString stringWithFormat:@"%g", result]
                    glyph:glyph
@@ -233,7 +255,7 @@ NSString* variableValue( NSString* txt, const NSDictionary* bindings );
 /*  Checks bindings for a key matching txt. If present, the associated value
     is returned. Otherwise, txt is returned.
 */
-NSString* variableValue( NSString* txt, const NSDictionary* bindings ) {
+NSString* variableValue( NSString* txt, NSDictionary* bindings ) {
     NSString* value = [bindings objectForKey:txt];
     return  value ? value : txt; 
 }
@@ -247,9 +269,6 @@ NSString* variableValue( NSString* txt, const NSDictionary* bindings ) {
      withBindings:(NSDictionary*)bindings
 {
     NSString* oprnd;
-
-    //  Clear data from any previous calculation in this brain.
-    [brain init];
 
     for ( NSArray* arr in pl ) {
 

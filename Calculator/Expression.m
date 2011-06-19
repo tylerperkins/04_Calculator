@@ -69,7 +69,7 @@
 /*  Returns YES iff this expression contains at least one variable.
 */
 - (BOOL) hasVariables {
-    return  [self.variables count] != 0;
+    return  [variables count] != 0;
 }
 
 

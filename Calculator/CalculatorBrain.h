@@ -8,15 +8,16 @@
 
 #import <Foundation/Foundation.h>
 #import "Expression.h"
+#import "SavesAndRestoresDefaults.h"
 
 typedef num (^unaryOperation )(num);
 typedef num (^binaryOperation)(num,num);
 
-@interface CalculatorBrain : NSObject {
+@interface CalculatorBrain : NSObject <SavesAndRestoresDefaults> {
     num             operand1;
-    num             memory;
     binaryOperation pendingOp;
 }
+@property (nonatomic)          num         memory;
 @property (readonly,nonatomic) num         result;
 @property (readonly,nonatomic) Expression* expression;
 

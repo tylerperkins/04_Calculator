@@ -13,6 +13,7 @@
 @interface CalculatorTests : SenTestCase {
     CalculatorViewController* calculatorViewController;
     NSDictionary* buttons;
+    NSUserDefaults* defaults;
 }
 
 @end

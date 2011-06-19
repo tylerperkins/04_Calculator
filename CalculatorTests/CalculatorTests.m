@@ -11,7 +11,6 @@
 @interface CalculatorTests ()
 - (void) pushButtonWithTitle:(NSString*)txt;
 @end
-
 NSDictionary* newDictOfButtonsByTitleInView( UIView* view );
 
 
@@ -34,12 +33,16 @@ NSDictionary* newDictOfButtonsByTitleInView( UIView* view );
     //  Button dict. Also, accessing calculatorViewController.view forces
     //  loading the CalculatorViewController.xib and initializing outlets.
     buttons = newDictOfButtonsByTitleInView( calculatorViewController.view );
+
+    defaults = [[NSUserDefaults standardUserDefaults] retain];
+    clearAppDefaults(defaults);
 }
 
 
 - (void)tearDown {
     // Tear-down code here.
 
+    [defaults release];
     [buttons release];
     [calculatorViewController release];
     [super tearDown];
@@ -48,18 +51,119 @@ NSDictionary* newDictOfButtonsByTitleInView( UIView* view );
 
 #pragma mark - Tests
 
+/*  Test that user defaults are empty initially.
+*/
+- (void) test$Setup {
+    STAssertFalse(
+        [defaults boolForKey:defaultKey(HaveSavedValues)],
+        @"The default object used for testing must start out clean."
+    );
+
+    [defaults setBool:YES forKey:defaultKey(HaveSavedValues)];
+    [defaults setObject:@"TEST" forKey:defaultKey(Typing)];
+
+    STAssertTrue(
+        [defaults boolForKey:defaultKey(HaveSavedValues)],
+        @"The default object should store a BOOL value."
+    );
+    STAssertEqualObjects(
+        [defaults stringForKey:defaultKey(Typing)],
+        @"TEST",
+        @"The default object should store a NSString value."
+    );
+
+    //  Clear out those Calculator defaults set above.
+    clearAppDefaults(defaults);
+
+    STAssertFalse(
+        [defaults boolForKey:defaultKey(HaveSavedValues)],
+        @"The default object should be cleared."
+    );
+    STAssertNil(
+        [defaults stringForKey:defaultKey(Typing)],
+        @"The default object should be cleared."
+    );
+    STAssertNil(
+        [defaults stringForKey:defaultKey(ExpressionPlist)],
+        @"The default object used for testing must start out clean."
+    );
+}
+
 
 /*  Test entry '3'. CalculatorBrain should automatically add '='.
+    Test that state in the middle of an numerical calculation is saved to
+    user defaults.
 */
 - (void) testConstant {
     CGFloat (^f)(CGFloat);
 
     [self pushButtonWithTitle:@"3"];
+
+    [calculatorViewController saveToUserDefaults:defaults];
+    STAssertTrue(
+        [defaults boolForKey:defaultKey(HaveSavedValues)],
+        @"User defaults should know we have saved values."
+    );
+    STAssertEqualObjects(
+        [defaults stringForKey:defaultKey(Typing)],
+        @"3",
+        @"Defaults should contain typing display value."
+    );
+
+    [self pushButtonWithTitle:@"Sto"];
     [self pushButtonWithTitle:@"="];
+
     f = [calculatorViewController functionOfX];
     STAssertEquals( f(-1.0), (CGFloat)3.0, @"operation 3" );
     STAssertEquals( f( 0.0), (CGFloat)3.0, @"operation 3" );
     STAssertEquals( f( 1.0), (CGFloat)3.0, @"operation 3" );
+
+    //  Test recovery using restoreFromDefaults:.
+
+    [self pushButtonWithTitle:@"+"];
+    [self pushButtonWithTitle:@"1"];
+    
+    [calculatorViewController saveToUserDefaults:defaults];
+    [calculatorViewController clearPressed];
+    [calculatorViewController restoreFromUserDefaults:defaults];
+
+    STAssertEqualObjects(
+        calculatorViewController.display.text,
+        @"1",
+        @"Entered digit should be restored."
+    );
+
+    [self pushButtonWithTitle:@"6"];
+
+    STAssertEqualObjects(
+        calculatorViewController.display.text,
+        @"16",
+        @"Entering digits should continue."
+    );
+
+    [self pushButtonWithTitle:@"sqrt"];
+
+    STAssertEqualObjects(
+        calculatorViewController.display.text,
+        @"4",
+        @"Sqrt should operate on complete number."
+    );
+
+    [self pushButtonWithTitle:@"="];
+
+    STAssertEqualObjects(
+        calculatorViewController.display.text,
+        @"7",
+        @"Restoring from user defaults should recover '+' operatation."
+    );
+
+    [self pushButtonWithTitle:@"Rcl"];
+    
+    STAssertEqualObjects(
+        calculatorViewController.display.text,
+        @"3",
+        @"Rcl should obtain stored number."
+    );
 }
 
 
@@ -107,18 +211,19 @@ NSDictionary* newDictOfButtonsByTitleInView( UIView* view );
     [self pushButtonWithTitle:@"x"];
     [self pushButtonWithTitle:@"cos"];
     [self pushButtonWithTitle:@"*"];
+
+    //  Simulate quitting and restarting in the middle of entering expression.
+    [calculatorViewController saveToUserDefaults:defaults];
+    [calculatorViewController clearPressed];
+    [calculatorViewController restoreFromUserDefaults:defaults];
+
     [self pushButtonWithTitle:@"="];
     [self pushButtonWithTitle:@"+"];
     [self pushButtonWithTitle:@"Rcl"];
     [self pushButtonWithTitle:@"="];
     [self pushButtonWithTitle:@"sqrt"];
-    STAssertTrue(
-        [calculatorViewController.display.text
-            isEqual:@" x sin * = Sto x cos * = + Rcl = sqrt"
-        ],  //        ^-- Note leading space.
-        @"display string"
-    );
     f = [calculatorViewController functionOfX];
+
     STAssertEqualsWithAccuracy( f(-1.0), (CGFloat)1.0, 0.0001, @"at -1.0" );
     STAssertEqualsWithAccuracy( f(0.0),  (CGFloat)1.0, 0.0001, @"at 0.0" );
     STAssertEqualsWithAccuracy( f(3.14), (CGFloat)1.0, 0.0001, @"at ~ PI" );

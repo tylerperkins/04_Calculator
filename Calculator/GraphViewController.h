@@ -9,9 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "GraphView.h"
 
-@interface GraphViewController : UIViewController
-    <GraphDataDelegate, UISplitViewControllerDelegate>
-{}
+@interface GraphViewController : UIViewController <
+    GraphDataDelegate,
+    UISplitViewControllerDelegate,
+    SavesAndRestoresDefaults
+> {}
+
 @property (retain,nonatomic) IBOutlet id<GraphDataDelegate> delegate;
 
 - (CGFloat (^)(CGFloat)) functionOfX;  // Implements proto. GraphDataDelegate.

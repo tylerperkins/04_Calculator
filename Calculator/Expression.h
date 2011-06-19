@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SavesAndRestoresDefaults.h"
 
 #define PREV_RESULT_SYMBOL @"use_previous_result"
 

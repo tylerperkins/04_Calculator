@@ -74,11 +74,14 @@
 - (void) didRotateFromInterfaceOrientation:(UIInterfaceOrientation)ornt {
     if (
         UIInterfaceOrientationIsLandscape(self.interfaceOrientation) !=
-        UIInterfaceOrientationIsLandscape(ornt)
+            UIInterfaceOrientationIsLandscape(ornt)
+        &&                       // Check that the view has laid-out bounds.
+        [SELF_VIEW hasCoordSys]  // This won't be the case on startup.
     ) {
         //  User changed from a portrait orientation (possibly upside-down)
-        //  to a landscape orientation (pointed left or right), or vice versa.
-        //  Calculate the displacement of the middle of the view in points.
+        //  to a landscape orientation (pointed left or right), or vice
+        //  versa. Calculate the displacement of the middle of the view in
+        //  points.
         CGFloat shiftX = (
             SELF_VIEW.bounds.size.width - self.sizeBeforeRotation.width
         )/2.0;
@@ -139,6 +142,19 @@
 
     //  Remove the button item of the right nav. controller.
     self.navigationItem.leftBarButtonItem = nil;
+}
+
+
+#pragma mark - Implmentation of protocol SavesAndRestoresDefaults
+
+
+- (void) saveToUserDefaults:(NSUserDefaults*)defaults {
+    [(GraphView*)self.view saveToUserDefaults:defaults];
+}
+
+
+- (void) restoreFromUserDefaults:(NSUserDefaults*)defaults {
+    [(GraphView*)self.view restoreFromUserDefaults:defaults];
 }
 
 

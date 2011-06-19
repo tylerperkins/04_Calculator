@@ -38,6 +38,7 @@
 		2FA648BA1361005C00D6249C /* README.org in Resources */ = {isa = PBXBuildFile; fileRef = 2FA648B91361005C00D6249C /* README.org */; };
 		2FA648BF1361007D00D6249C /* CalculatorViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2FA648BB1361007D00D6249C /* CalculatorViewController.xib */; };
 		2FA648C01361007D00D6249C /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2FA648BD1361007D00D6249C /* MainWindow.xib */; };
+		2FF2FC2913A4164100A1B8FE /* SavesAndRestoresDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 2FF2FC2813A4164100A1B8FE /* SavesAndRestoresDefaults.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +81,7 @@
 		2F37F4301386DD530086D467 /* UIView+DrawHelp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+DrawHelp.h"; sourceTree = "<group>"; };
 		2F37F4311386DD530086D467 /* UIView+DrawHelp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+DrawHelp.m"; sourceTree = "<group>"; };
 		2F37F446138B213F0086D467 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "iPad/en.lproj/MainWindow-iPad.xib"; sourceTree = "<group>"; };
+		2F6AA30E139D3EB7008CFF93 /* SavesAndRestoresDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SavesAndRestoresDefaults.h; sourceTree = "<group>"; };
 		2F7625DA13670B9600764768 /* GraphViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GraphViewController.h; sourceTree = "<group>"; };
 		2F7625DB13670B9600764768 /* GraphViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GraphViewController.m; sourceTree = "<group>"; };
 		2F7625F113671EF700764768 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/GraphViewController.xib; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 		2FA648B91361005C00D6249C /* README.org */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.org; sourceTree = "<group>"; };
 		2FA648BC1361007D00D6249C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = Calculator/en.lproj/CalculatorViewController.xib; sourceTree = "<group>"; };
 		2FA648BE1361007D00D6249C /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = Calculator/en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		2FF2FC2813A4164100A1B8FE /* SavesAndRestoresDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SavesAndRestoresDefaults.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,8 +157,6 @@
 				2F0F0B401360FA8400F27AB1 /* CalculatorViewController.h */,
 				2F0F0B411360FA8400F27AB1 /* CalculatorViewController.m */,
 				2FA648BB1361007D00D6249C /* CalculatorViewController.xib */,
-				2F37F42C138314F50086D467 /* GraphTests.h */,
-				2F37F42D138314F60086D467 /* GraphTests.m */,
 				2F7625DA13670B9600764768 /* GraphViewController.h */,
 				2F7625DB13670B9600764768 /* GraphViewController.m */,
 				2F7625F013671EF700764768 /* GraphViewController.xib */,
@@ -167,6 +168,8 @@
 				2F0F0B3D1360FA8400F27AB1 /* CalculatorBrain.m */,
 				2F0F0B421360FA8400F27AB1 /* Expression.h */,
 				2F0F0B431360FA8400F27AB1 /* Expression.m */,
+				2F6AA30E139D3EB7008CFF93 /* SavesAndRestoresDefaults.h */,
+				2FF2FC2813A4164100A1B8FE /* SavesAndRestoresDefaults.m */,
 				2F37F3721370819F0086D467 /* AxesDrawer.h */,
 				2F37F3731370819F0086D467 /* AxesDrawer.m */,
 				2F0F0B041360F94400F27AB1 /* Supporting Files */,
@@ -190,6 +193,8 @@
 			children = (
 				2F0F0B241360F94400F27AB1 /* CalculatorTests.h */,
 				2F0F0B261360F94400F27AB1 /* CalculatorTests.m */,
+				2F37F42C138314F50086D467 /* GraphTests.h */,
+				2F37F42D138314F60086D467 /* GraphTests.m */,
 				2F0F0B1E1360F94400F27AB1 /* Supporting Files */,
 			);
 			path = CalculatorTests;
@@ -330,6 +335,7 @@
 				2FA143991370762700A3B807 /* GraphView.m in Sources */,
 				2F37F3741370819F0086D467 /* AxesDrawer.m in Sources */,
 				2F37F4321386DD530086D467 /* UIView+DrawHelp.m in Sources */,
+				2FF2FC2913A4164100A1B8FE /* SavesAndRestoresDefaults.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

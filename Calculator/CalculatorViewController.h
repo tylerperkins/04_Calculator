@@ -7,10 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SavesAndRestoresDefaults.h"
 #import "CalculatorBrain.h"
 #import "GraphViewController.h"
 
-@interface CalculatorViewController : UIViewController <GraphDataDelegate> {}
+@interface CalculatorViewController : UIViewController
+<GraphDataDelegate, SavesAndRestoresDefaults>
+{}
 @property (nonatomic,retain) IBOutlet UILabel*             display;
 @property (nonatomic,retain) IBOutlet UIButton*            equalsButton;
 @property (nonatomic,retain) IBOutlet CalculatorBrain*     brain;

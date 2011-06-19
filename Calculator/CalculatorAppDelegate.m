@@ -11,7 +11,7 @@
 @implementation CalculatorAppDelegate
 
 
-@synthesize window=_window;
+@synthesize window, calculatorViewController;
 
 
 - (BOOL)          application:(UIApplication *)application
@@ -19,6 +19,9 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
      
+    [calculatorViewController restoreFromUserDefaults:[
+        NSUserDefaults standardUserDefaults
+    ]];
     [self.window makeKeyAndVisible];
     return YES;
 }
@@ -37,6 +40,9 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
      Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
      If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
      */
+    [calculatorViewController saveToUserDefaults:[
+        NSUserDefaults standardUserDefaults
+    ]];
 }
 
 
@@ -44,6 +50,9 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
     /*
      Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
      */
+    [calculatorViewController restoreFromUserDefaults:[
+        NSUserDefaults standardUserDefaults
+    ]];
 }
 
 
@@ -64,7 +73,8 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 
 
 - (void) dealloc {
-    [_window release];
+    [calculatorViewController release];
+    [window release];
     [super dealloc];
 }
 

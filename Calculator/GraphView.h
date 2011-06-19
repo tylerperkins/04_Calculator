@@ -8,12 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "UIView+DrawHelp.h"
+#import "SavesAndRestoresDefaults.h"
 
 @protocol GraphDataDelegate <NSObject>
 - (CGFloat (^)(CGFloat)) functionOfX;
 @end
 
-@interface GraphView : UIView {}
+@interface GraphView : UIView<SavesAndRestoresDefaults> {}
 
 //  We don't need to retain the delegate, because we're sure this GraphView
 //  will be released before the delegate is, which is the GraphViewController.
@@ -24,9 +25,6 @@
 @property (assign,nonatomic) CGAffineTransform coordSys;
 @property (assign,nonatomic) CGAffineTransform coordSysInverse;
 
-- (CGAffineTransform) initialCoordSys;
-- (CGAffineTransform) translateToMiddle;
-- (CGAffineTransform) dilationAtMiddleWithScaleX:(CGFloat)scaleX
-                                               y:(CGFloat)scaleY;
+- (BOOL) hasCoordSys;
 
 @end
