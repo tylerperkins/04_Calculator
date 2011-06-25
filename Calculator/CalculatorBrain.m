@@ -55,6 +55,12 @@ NSString* variableValue( NSString* txt, NSDictionary* bindings );
 }
 
 
+- (void) dealloc {
+    [expression release];
+    [super dealloc];
+}
+
+
 #pragma mark - Operators
 
 
